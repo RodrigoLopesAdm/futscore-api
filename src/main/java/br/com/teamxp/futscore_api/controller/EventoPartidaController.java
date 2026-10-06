@@ -32,6 +32,13 @@ public class EventoPartidaController {
         return eventoPartidaService.listarTodos();
     }
 
+    @GetMapping("/partida/{partidaId}")
+    public List<EventoPartida> listarPorPartida(
+            @PathVariable Long partidaId) {
+
+        return eventoPartidaService.listarPorPartida(partidaId);
+    }
+
     @GetMapping("/{id}")
     public EventoPartida buscarPorId(@PathVariable Long id) {
         return eventoPartidaService.buscarPorId(id);

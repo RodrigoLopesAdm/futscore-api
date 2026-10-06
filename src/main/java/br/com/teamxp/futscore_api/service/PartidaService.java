@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import br.com.teamxp.futscore_api.dto.PartidaDTO;
+import br.com.teamxp.futscore_api.dto.ResultadoPartidaDTO;
 import br.com.teamxp.futscore_api.model.Campeonato;
 import br.com.teamxp.futscore_api.model.Equipe;
 import br.com.teamxp.futscore_api.model.Partida;
@@ -103,6 +104,16 @@ public class PartidaService {
         partida.setCampeonato(campeonato);
         partida.setMandante(mandante);
         partida.setVisitante(visitante);
+
+        return partidaRepository.save(partida);
+    }
+
+    public Partida registrarResultado(Long id, ResultadoPartidaDTO dto) {
+        Partida partida = buscarPorId(id);
+
+        partida.setPlacarMandante(dto.getPlacarMandante());
+        partida.setPlacarVisitante(dto.getPlacarVisitante());
+        partida.setStatus(dto.getStatus());
 
         return partidaRepository.save(partida);
     }

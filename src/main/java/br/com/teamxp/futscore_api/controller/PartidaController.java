@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.teamxp.futscore_api.dto.PartidaDTO;
+import br.com.teamxp.futscore_api.dto.ResultadoPartidaDTO;
 import br.com.teamxp.futscore_api.model.Partida;
 import br.com.teamxp.futscore_api.service.PartidaService;
 import jakarta.validation.Valid;
@@ -48,6 +49,14 @@ public class PartidaController {
             @PathVariable Long id,
             @Valid @RequestBody PartidaDTO dto) {
         return partidaService.atualizar(id, dto);
+    }
+
+    @PutMapping("/{id}/resultado")
+    public Partida registrarResultado(
+        @PathVariable Long id,
+        @Valid @RequestBody ResultadoPartidaDTO dto) {
+
+    return partidaService.registrarResultado(id, dto);
     }
 
     @DeleteMapping("/{id}")

@@ -1,5 +1,7 @@
 package br.com.teamxp.futscore_api.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,10 +18,11 @@ public class Usuario {
 
     private String email;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String senha;
 
     public Long getId() {
-    return id;
+        return id;
     }
 
     public void setId(Long id) {
@@ -49,5 +52,4 @@ public class Usuario {
     public void setSenha(String senha) {
         this.senha = senha;
     }
-
 }

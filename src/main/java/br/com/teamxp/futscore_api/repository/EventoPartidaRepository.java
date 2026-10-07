@@ -10,4 +10,8 @@ public interface EventoPartidaRepository
         extends JpaRepository<EventoPartida, Long> {
 
     List<EventoPartida> findByPartidaId(Long partidaId);
+
+    List<EventoPartida> findByPartidaCampeonatoIdAndTipoIgnoreCase(
+            Long campeonatoId,
+            String tipo);
 }

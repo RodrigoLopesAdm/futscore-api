@@ -1,5 +1,7 @@
+
 package br.com.teamxp.futscore_api.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -23,7 +25,8 @@ public class ComunicadoService {
 
     public Comunicado buscarPorId(Long id) {
         return comunicadoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Comunicado não encontrado"));
+                .orElseThrow(() ->
+                        new RuntimeException("Comunicado não encontrado"));
     }
 
     public Comunicado salvar(ComunicadoDTO dto) {
@@ -32,7 +35,12 @@ public class ComunicadoService {
 
         comunicado.setTitulo(dto.getTitulo());
         comunicado.setMensagem(dto.getMensagem());
-        comunicado.setDataPublicacao(dto.getDataPublicacao());
+
+        if (dto.getDataPublicacao() != null) {
+            comunicado.setDataPublicacao(dto.getDataPublicacao());
+        } else {
+            comunicado.setDataPublicacao(LocalDateTime.now());
+        }
 
         return comunicadoRepository.save(comunicado);
     }
@@ -43,7 +51,10 @@ public class ComunicadoService {
 
         comunicado.setTitulo(dto.getTitulo());
         comunicado.setMensagem(dto.getMensagem());
-        comunicado.setDataPublicacao(dto.getDataPublicacao());
+
+        if (dto.getDataPublicacao() != null) {
+            comunicado.setDataPublicacao(dto.getDataPublicacao());
+        }
 
         return comunicadoRepository.save(comunicado);
     }
@@ -53,3 +64,4 @@ public class ComunicadoService {
         comunicadoRepository.delete(comunicado);
     }
 }
+

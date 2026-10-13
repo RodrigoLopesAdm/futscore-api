@@ -1,8 +1,11 @@
+
 package br.com.teamxp.futscore_api.service;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import br.com.teamxp.futscore_api.dto.UsuarioDTO;
 import br.com.teamxp.futscore_api.model.Usuario;
@@ -24,8 +27,10 @@ public class UsuarioService {
     public Usuario buscarPorId(Long id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Usuário não encontrado"));
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Usuário não encontrado"
+                        ));
     }
 
     public Usuario salvar(UsuarioDTO dto) {
@@ -67,3 +72,4 @@ public class UsuarioService {
         usuarioRepository.delete(usuario);
     }
 }
+

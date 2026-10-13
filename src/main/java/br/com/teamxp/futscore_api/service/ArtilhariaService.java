@@ -5,7 +5,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import br.com.teamxp.futscore_api.dto.ArtilhariaDTO;
 import br.com.teamxp.futscore_api.model.Atleta;
@@ -30,7 +32,10 @@ public class ArtilhariaService {
     public List<ArtilhariaDTO> gerarArtilharia(Long campeonatoId) {
 
         if (!campeonatoRepository.existsById(campeonatoId)) {
-            throw new RuntimeException("Campeonato não encontrado");
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Campeonato não encontrado"
+            );
         }
 
         List<EventoPartida> gols =
@@ -56,15 +61,18 @@ public class ArtilhariaService {
                         atleta.getNome(),
                         atleta.getEquipe().getId(),
                         atleta.getEquipe().getNome(),
-                        0L);
+                        0L
+                );
 
                 artilheiros.put(
                         atleta.getId(),
-                        artilheiro);
+                        artilheiro
+                );
             }
 
             artilheiro.setGols(
-                    artilheiro.getGols() + 1);
+                    artilheiro.getGols() + 1
+            );
         }
 
         List<ArtilhariaDTO> resultado =
@@ -73,7 +81,9 @@ public class ArtilhariaService {
         resultado.sort(
                 (a, b) -> Long.compare(
                         b.getGols(),
-                        a.getGols()));
+                        a.getGols()
+                )
+        );
 
         return resultado;
     }

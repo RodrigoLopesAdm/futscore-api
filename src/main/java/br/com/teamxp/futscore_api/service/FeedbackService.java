@@ -1,8 +1,11 @@
+
 package br.com.teamxp.futscore_api.service;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import br.com.teamxp.futscore_api.dto.FeedbackDTO;
 import br.com.teamxp.futscore_api.model.Feedback;
@@ -23,7 +26,11 @@ public class FeedbackService {
 
     public Feedback buscarPorId(Long id) {
         return feedbackRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Feedback não encontrado"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Feedback não encontrado"
+                        ));
     }
 
     public Feedback salvar(FeedbackDTO dto) {

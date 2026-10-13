@@ -1,8 +1,11 @@
+
 package br.com.teamxp.futscore_api.service;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import br.com.teamxp.futscore_api.dto.AtletaDTO;
 import br.com.teamxp.futscore_api.model.Atleta;
@@ -31,7 +34,10 @@ public class AtletaService {
     public Atleta buscarPorId(Long id) {
         return atletaRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Atleta não encontrado"));
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Atleta não encontrado"
+                        ));
     }
 
     public Atleta salvar(AtletaDTO dto) {
@@ -40,7 +46,10 @@ public class AtletaService {
 
         Equipe equipe = equipeRepository.findById(dto.getEquipeId())
                 .orElseThrow(() ->
-                        new RuntimeException("Equipe não encontrada"));
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Equipe não encontrada"
+                        ));
 
         Atleta atleta = new Atleta();
 
@@ -61,7 +70,10 @@ public class AtletaService {
 
         Equipe equipe = equipeRepository.findById(dto.getEquipeId())
                 .orElseThrow(() ->
-                        new RuntimeException("Equipe não encontrada"));
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Equipe não encontrada"
+                        ));
 
         atleta.setNome(dto.getNome());
         atleta.setPosicao(dto.getPosicao());

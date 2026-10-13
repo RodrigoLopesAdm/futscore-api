@@ -109,12 +109,14 @@ public class EventoPartidaService {
             Partida partida,
             Atleta atleta) {
 
+        
         if (!dto.getTipo().equalsIgnoreCase("GOL")
+                && !dto.getTipo().equalsIgnoreCase("ASSISTENCIA")
                 && !dto.getTipo().equalsIgnoreCase("CARTAO_AMARELO")
                 && !dto.getTipo().equalsIgnoreCase("CARTAO_VERMELHO")) {
 
             throw new RuntimeException(
-                    "Tipo de evento inválido. Use GOL, CARTAO_AMARELO ou CARTAO_VERMELHO");
+                    "Tipo de evento inválido. Use GOL, ASSISTENCIA, CARTAO_AMARELO ou CARTAO_VERMELHO");
         }
 
         if (dto.getMinuto() != null && dto.getMinuto() < 0) {

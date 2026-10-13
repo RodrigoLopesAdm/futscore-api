@@ -1,3 +1,4 @@
+
 package br.com.teamxp.futscore_api.dto;
 
 import java.time.LocalDate;
@@ -22,6 +23,10 @@ public class PartidaDTO {
     private Integer placarVisitante;
 
     private String status;
+
+    // Identificação da fase e do grupo da partida
+    private String fase;
+    private Long grupoId;
 
     @NotNull(message = "O campeonato é obrigatório")
     private Long campeonatoId;
@@ -88,6 +93,22 @@ public class PartidaDTO {
         this.status = status;
     }
 
+    public String getFase() {
+        return fase;
+    }
+
+    public void setFase(String fase) {
+        this.fase = fase;
+    }
+
+    public Long getGrupoId() {
+        return grupoId;
+    }
+
+    public void setGrupoId(Long grupoId) {
+        this.grupoId = grupoId;
+    }
+
     public Long getCampeonatoId() {
         return campeonatoId;
     }
@@ -112,3 +133,4 @@ public class PartidaDTO {
         this.visitanteId = visitanteId;
     }
 }
+

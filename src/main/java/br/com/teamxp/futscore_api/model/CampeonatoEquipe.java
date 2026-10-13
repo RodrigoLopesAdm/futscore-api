@@ -1,3 +1,4 @@
+
 package br.com.teamxp.futscore_api.model;
 
 import jakarta.persistence.Entity;
@@ -22,8 +23,13 @@ public class CampeonatoEquipe {
     @JoinColumn(name = "equipe_id")
     private Equipe equipe;
 
+    // Grupo da equipe neste campeonato (opcional)
+    @ManyToOne
+    @JoinColumn(name = "grupo_id", nullable = true)
+    private Grupo grupo;
+
     public Long getId() {
-    return id;
+        return id;
     }
 
     public void setId(Long id) {
@@ -46,4 +52,12 @@ public class CampeonatoEquipe {
         this.equipe = equipe;
     }
 
+    public Grupo getGrupo() {
+        return grupo;
+    }
+
+    public void setGrupo(Grupo grupo) {
+        this.grupo = grupo;
+    }
 }
+

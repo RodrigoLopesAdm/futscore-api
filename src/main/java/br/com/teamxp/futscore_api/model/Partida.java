@@ -1,3 +1,4 @@
+
 package br.com.teamxp.futscore_api.model;
 
 import java.time.LocalDate;
@@ -29,6 +30,9 @@ public class Partida {
 
     private String status;
 
+    // Identifica a fase da competição
+    private String fase;
+
     @ManyToOne
     @JoinColumn(name = "campeonato_id")
     private Campeonato campeonato;
@@ -41,8 +45,13 @@ public class Partida {
     @JoinColumn(name = "visitante_id")
     private Equipe visitante;
 
+    // Grupo ao qual a partida pertence, quando aplicável
+    @ManyToOne
+    @JoinColumn(name = "grupo_id")
+    private Grupo grupo;
+
     public Long getId() {
-    return id;
+        return id;
     }
 
     public void setId(Long id) {
@@ -97,6 +106,14 @@ public class Partida {
         this.status = status;
     }
 
+    public String getFase() {
+        return fase;
+    }
+
+    public void setFase(String fase) {
+        this.fase = fase;
+    }
+
     public Campeonato getCampeonato() {
         return campeonato;
     }
@@ -121,4 +138,11 @@ public class Partida {
         this.visitante = visitante;
     }
 
+    public Grupo getGrupo() {
+        return grupo;
+    }
+
+    public void setGrupo(Grupo grupo) {
+        this.grupo = grupo;
+    }
 }

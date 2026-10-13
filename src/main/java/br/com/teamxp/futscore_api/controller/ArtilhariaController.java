@@ -1,7 +1,9 @@
+
 package br.com.teamxp.futscore_api.controller;
 
 import java.util.List;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.teamxp.futscore_api.dto.ArtilhariaDTO;
 import br.com.teamxp.futscore_api.service.ArtilhariaService;
 
+@CrossOrigin(origins = {
+    "http://127.0.0.1:5500",
+    "http://localhost:5500"
+})
 @RestController
 @RequestMapping("/api/artilharia")
 public class ArtilhariaController {
@@ -29,3 +35,4 @@ public class ArtilhariaController {
         return artilhariaService.gerarArtilharia(campeonatoId);
     }
 }
+

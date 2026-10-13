@@ -1,8 +1,10 @@
+
 package br.com.teamxp.futscore_api.controller;
 
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +22,10 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/partidas")
+@CrossOrigin(origins = {
+    "http://127.0.0.1:5500",
+    "http://localhost:5500"
+})
 public class PartidaController {
 
     private final PartidaService partidaService;
@@ -41,6 +47,7 @@ public class PartidaController {
     @PostMapping
     public Partida salvar(
             @Valid @RequestBody PartidaDTO dto) {
+
         return partidaService.salvar(dto);
     }
 
@@ -48,20 +55,23 @@ public class PartidaController {
     public Partida atualizar(
             @PathVariable Long id,
             @Valid @RequestBody PartidaDTO dto) {
+
         return partidaService.atualizar(id, dto);
     }
 
     @PutMapping("/{id}/resultado")
     public Partida registrarResultado(
-        @PathVariable Long id,
-        @Valid @RequestBody ResultadoPartidaDTO dto) {
+            @PathVariable Long id,
+            @Valid @RequestBody ResultadoPartidaDTO dto) {
 
-    return partidaService.registrarResultado(id, dto);
+        return partidaService.registrarResultado(id, dto);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
+
         partidaService.excluir(id);
         return ResponseEntity.noContent().build();
     }
 }
+

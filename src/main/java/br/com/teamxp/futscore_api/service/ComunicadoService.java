@@ -4,7 +4,9 @@ package br.com.teamxp.futscore_api.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import br.com.teamxp.futscore_api.dto.ComunicadoDTO;
 import br.com.teamxp.futscore_api.model.Comunicado;
@@ -26,7 +28,10 @@ public class ComunicadoService {
     public Comunicado buscarPorId(Long id) {
         return comunicadoRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Comunicado não encontrado"));
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Comunicado não encontrado"
+                        ));
     }
 
     public Comunicado salvar(ComunicadoDTO dto) {
@@ -64,4 +69,5 @@ public class ComunicadoService {
         comunicadoRepository.delete(comunicado);
     }
 }
+
 

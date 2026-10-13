@@ -1,8 +1,11 @@
+
 package br.com.teamxp.futscore_api.service;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import br.com.teamxp.futscore_api.dto.EquipeDTO;
 import br.com.teamxp.futscore_api.model.Equipe;
@@ -23,7 +26,11 @@ public class EquipeService {
 
     public Equipe buscarPorId(Long id) {
         return equipeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Equipe não encontrada"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Equipe não encontrada"
+                        ));
     }
 
     public Equipe salvar(EquipeDTO dto) {

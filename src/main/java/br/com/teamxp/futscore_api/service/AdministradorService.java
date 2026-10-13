@@ -1,8 +1,11 @@
+
 package br.com.teamxp.futscore_api.service;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import br.com.teamxp.futscore_api.dto.AdministradorDTO;
 import br.com.teamxp.futscore_api.model.Administrador;
@@ -31,8 +34,10 @@ public class AdministradorService {
     public Administrador buscarPorId(Long id) {
         return administradorRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Administrador não encontrado"));
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Administrador não encontrado"
+                        ));
     }
 
     public Administrador salvar(AdministradorDTO dto) {
@@ -40,8 +45,10 @@ public class AdministradorService {
         Usuario usuario = usuarioRepository
                 .findById(dto.getUsuarioId())
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Usuário não encontrado"));
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Usuário não encontrado"
+                        ));
 
         if (administradorRepository
                 .existsByUsuarioId(dto.getUsuarioId())) {
@@ -67,8 +74,10 @@ public class AdministradorService {
         Usuario usuario = usuarioRepository
                 .findById(dto.getUsuarioId())
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Usuário não encontrado"));
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Usuário não encontrado"
+                        ));
 
         if (administradorRepository
                 .existsByUsuarioIdAndIdNot(

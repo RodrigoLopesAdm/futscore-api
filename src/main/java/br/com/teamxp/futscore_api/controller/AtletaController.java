@@ -11,12 +11,17 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import br.com.teamxp.futscore_api.dto.AtletaDTO;
 import br.com.teamxp.futscore_api.model.Atleta;
 import br.com.teamxp.futscore_api.service.AtletaService;
 import jakarta.validation.Valid;
 
+@CrossOrigin(origins = {
+    "http://127.0.0.1:5500",
+    "http://localhost:5500"
+})
 @RestController
 @RequestMapping("/api/atletas")
 public class AtletaController {

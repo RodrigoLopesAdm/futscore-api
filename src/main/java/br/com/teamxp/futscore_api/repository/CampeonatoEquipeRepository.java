@@ -32,5 +32,8 @@ public interface CampeonatoEquipeRepository
 
     // Verifica se o campeonato possui equipes inscritas
     boolean existsByCampeonatoId(Long campeonatoId);
+
+    // Verifica se a equipe está inscrita em algum campeonato
+    boolean existsByEquipeId(Long equipeId);        
 }
 

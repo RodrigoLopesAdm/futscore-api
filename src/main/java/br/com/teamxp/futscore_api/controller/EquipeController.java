@@ -1,8 +1,10 @@
+
 package br.com.teamxp.futscore_api.controller;
 
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +21,10 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/equipes")
+@CrossOrigin(origins = {
+    "http://127.0.0.1:5500",
+    "http://localhost:5500"
+})
 public class EquipeController {
 
     private final EquipeService equipeService;
@@ -56,3 +62,4 @@ public class EquipeController {
         return ResponseEntity.noContent().build();
     }
 }
+

@@ -14,5 +14,11 @@ public interface PartidaRepository extends JpaRepository<Partida, Long> {
 
     // Verifica se existem partidas cadastradas no campeonato
     boolean existsByCampeonatoId(Long campeonatoId);
+
+    // Verifica se a equipe possui partidas como mandante
+    boolean existsByMandanteId(Long equipeId);
+
+    // Verifica se a equipe possui partidas como visitante
+    boolean existsByVisitanteId(Long equipeId);
 }
 

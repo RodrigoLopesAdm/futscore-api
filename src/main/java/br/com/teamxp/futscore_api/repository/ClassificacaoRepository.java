@@ -15,4 +15,7 @@ public interface ClassificacaoRepository
 
     // Verifica se existem registros de classificação no campeonato
     boolean existsByCampeonatoId(Long campeonatoId);
+
+    // Verifica se a equipe possui registros de classificação
+    boolean existsByEquipeId(Long equipeId);
 }

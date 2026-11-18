@@ -13,9 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
 import br.com.teamxp.futscore_api.model.Grupo;
 import br.com.teamxp.futscore_api.service.GrupoService;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 @RestController
 @RequestMapping("/api/grupos")
@@ -57,5 +58,27 @@ public class GrupoController {
             dados.get("nome")
         );
     }
+
+    
+    // Atualizar o nome de um grupo
+    @PutMapping("/{id}")
+    public Grupo atualizar(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> dados) {
+
+        return grupoService.atualizar(
+            id,
+            dados.get("nome")
+        );
+    }
+
+    // Excluir um grupo
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void excluir(@PathVariable Long id) {
+
+        grupoService.excluir(id);
+    }
+
 }
 

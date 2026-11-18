@@ -1,3 +1,4 @@
+
 package br.com.teamxp.futscore_api.dto;
 
 import java.time.LocalDate;
@@ -5,6 +6,7 @@ import java.time.LocalDate;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Min;
 
 public class CampeonatoDTO {
 
@@ -24,6 +26,40 @@ public class CampeonatoDTO {
 
     @NotNull(message = "A data de término é obrigatória")
     private LocalDate dataFim;
+
+    // =========================================
+    // REGRAS DE PONTUAÇÃO DO CAMPEONATO
+    // =========================================
+
+    @Min(value = 0, message = "Os pontos por vitória não podem ser negativos")
+    private Integer pontosVitoria;
+
+    @Min(value = 0, message = "Os pontos por empate não podem ser negativos")
+    private Integer pontosEmpate;
+
+    @Min(value = 0, message = "Os pontos por derrota não podem ser negativos")
+    private Integer pontosDerrota;
+    
+    // =========================================
+    // CONFIGURAÇÃO DO FORMATO DE DISPUTA
+    // =========================================
+
+    private String tipoDisputa;
+
+    @Min(value = 1, message = "A quantidade de grupos deve ser maior que zero")
+    private Integer quantidadeGrupos;
+
+    @Min(value = 1, message = "Deve haver pelo menos um classificado por grupo")
+    private Integer classificadosPorGrupo;
+
+    @Min(value = 0, message = "As vagas adicionais não podem ser negativas")
+    private Integer vagasAdicionais;
+
+    private String primeiraFaseEliminatoria;
+
+    // =========================================
+    // GETTERS E SETTERS
+    // =========================================
 
     public Long getId() {
         return id;
@@ -72,4 +108,75 @@ public class CampeonatoDTO {
     public void setDataFim(LocalDate dataFim) {
         this.dataFim = dataFim;
     }
+
+    // Pontos por vitória
+
+    public Integer getPontosVitoria() {
+        return pontosVitoria;
+    }
+
+    public void setPontosVitoria(Integer pontosVitoria) {
+        this.pontosVitoria = pontosVitoria;
+    }
+
+    // Pontos por empate
+
+    public Integer getPontosEmpate() {
+        return pontosEmpate;
+    }
+
+    public void setPontosEmpate(Integer pontosEmpate) {
+        this.pontosEmpate = pontosEmpate;
+    }
+
+    // Pontos por derrota
+
+    public Integer getPontosDerrota() {
+        return pontosDerrota;
+    }
+
+    public void setPontosDerrota(Integer pontosDerrota) {
+        this.pontosDerrota = pontosDerrota;
+    }
+
+    public String getTipoDisputa() {
+        return tipoDisputa;
+    }
+
+    public void setTipoDisputa(String tipoDisputa) {
+        this.tipoDisputa = tipoDisputa;
+    }
+
+    public Integer getQuantidadeGrupos() {
+        return quantidadeGrupos;
+    }
+
+    public void setQuantidadeGrupos(Integer quantidadeGrupos) {
+        this.quantidadeGrupos = quantidadeGrupos;
+    }
+
+    public Integer getClassificadosPorGrupo() {
+        return classificadosPorGrupo;
+    }
+
+    public void setClassificadosPorGrupo(Integer classificadosPorGrupo) {
+        this.classificadosPorGrupo = classificadosPorGrupo;
+    }
+
+    public Integer getVagasAdicionais() {
+        return vagasAdicionais;
+    }
+
+    public void setVagasAdicionais(Integer vagasAdicionais) {
+        this.vagasAdicionais = vagasAdicionais;
+    }
+
+    public String getPrimeiraFaseEliminatoria() {
+        return primeiraFaseEliminatoria;
+    }
+
+    public void setPrimeiraFaseEliminatoria(String primeiraFaseEliminatoria) {
+        this.primeiraFaseEliminatoria = primeiraFaseEliminatoria;
+    }
+
 }

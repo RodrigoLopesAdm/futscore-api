@@ -1,10 +1,11 @@
-
 package br.com.teamxp.futscore_api.service;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.com.teamxp.futscore_api.dto.PartidaDTO;
@@ -19,6 +20,7 @@ import br.com.teamxp.futscore_api.repository.CampeonatoRepository;
 import br.com.teamxp.futscore_api.repository.EquipeRepository;
 import br.com.teamxp.futscore_api.repository.GrupoRepository;
 import br.com.teamxp.futscore_api.repository.PartidaRepository;
+import br.com.teamxp.futscore_api.repository.EquipePartidaRepository;
 
 @Service
 public class PartidaService {
@@ -28,19 +30,22 @@ public class PartidaService {
     private final EquipeRepository equipeRepository;
     private final GrupoRepository grupoRepository;
     private final CampeonatoEquipeRepository campeonatoEquipeRepository;
+    private final EquipePartidaRepository equipePartidaRepository;
 
     public PartidaService(
             PartidaRepository partidaRepository,
             CampeonatoRepository campeonatoRepository,
             EquipeRepository equipeRepository,
             GrupoRepository grupoRepository,
-            CampeonatoEquipeRepository campeonatoEquipeRepository) {
+            CampeonatoEquipeRepository campeonatoEquipeRepository,
+            EquipePartidaRepository equipePartidaRepository) {
 
         this.partidaRepository = partidaRepository;
         this.campeonatoRepository = campeonatoRepository;
         this.equipeRepository = equipeRepository;
         this.grupoRepository = grupoRepository;
         this.campeonatoEquipeRepository = campeonatoEquipeRepository;
+        this.equipePartidaRepository = equipePartidaRepository;
     }
 
     public List<Partida> listarTodos() {
@@ -54,6 +59,10 @@ public class PartidaService {
                         "Partida não encontrada"));
     }
 
+    // =========================================
+    // CADASTRAR PARTIDA
+    // =========================================
+
     public Partida salvar(PartidaDTO dto) {
 
         Campeonato campeonato = buscarCampeonato(dto.getCampeonatoId());
@@ -62,8 +71,12 @@ public class PartidaService {
 
         validarPartida(dto, campeonato);
 
+        String fase = normalizarFase(dto.getFase());
+
+        Integer rodada = validarRodada(fase, dto.getRodada());
+
         Grupo grupo = validarGrupo(
-                dto.getFase(),
+                fase,
                 dto.getGrupoId(),
                 campeonato.getId(),
                 mandante.getId(),
@@ -73,20 +86,28 @@ public class PartidaService {
 
         partida.setData(dto.getData());
         partida.setHora(dto.getHora());
-        partida.setRodada(dto.getRodada());
+        partida.setRodada(rodada);
 
         partida.setPlacarMandante(0);
         partida.setPlacarVisitante(0);
+
+        partida.setPenaltisMandante(null);
+        partida.setPenaltisVisitante(null);
+
         partida.setStatus("NAO_INICIADA");
 
         partida.setCampeonato(campeonato);
         partida.setMandante(mandante);
         partida.setVisitante(visitante);
-        partida.setFase(normalizarFase(dto.getFase()));
+        partida.setFase(fase);
         partida.setGrupo(grupo);
 
         return partidaRepository.save(partida);
     }
+
+    // =========================================
+    // ATUALIZAR PARTIDA
+    // =========================================
 
     public Partida atualizar(Long id, PartidaDTO dto) {
 
@@ -101,14 +122,19 @@ public class PartidaService {
         // Preserva a fase atual quando não informada
         String fase = dto.getFase() != null
                 ? normalizarFase(dto.getFase())
-                : partida.getFase();
+                : normalizarFase(partida.getFase());
 
-        // Preserva o grupo atual quando não informado
-        Long grupoId = dto.getGrupoId() != null
-                ? dto.getGrupoId()
-                : partida.getGrupo() != null
-                    ? partida.getGrupo().getId()
-                    : null;
+        Integer rodada = validarRodada(fase, dto.getRodada());
+
+        // Preserva o grupo somente na fase de grupos
+        Long grupoId = dto.getGrupoId();
+
+        if ("GRUPOS".equals(fase)
+                && grupoId == null
+                && partida.getGrupo() != null) {
+
+            grupoId = partida.getGrupo().getId();
+        }
 
         Grupo grupo = validarGrupo(
                 fase,
@@ -117,21 +143,52 @@ public class PartidaService {
                 mandante.getId(),
                 visitante.getId());
 
+        // Define os placares e o status resultantes da edição
+        Integer placarMandante = dto.getPlacarMandante() != null
+                ? dto.getPlacarMandante()
+                : partida.getPlacarMandante();
+
+        Integer placarVisitante = dto.getPlacarVisitante() != null
+                ? dto.getPlacarVisitante()
+                : partida.getPlacarVisitante();
+
+        String status = dto.getStatus() != null
+                ? dto.getStatus()
+                : partida.getStatus();
+
+        Integer penaltisMandante = partida.getPenaltisMandante();
+        Integer penaltisVisitante = partida.getPenaltisVisitante();
+
+        // Remove os pênaltis quando não forem mais aplicáveis
+        if (!necessitaPenaltis(
+                fase,
+                status,
+                placarMandante,
+                placarVisitante)) {
+
+            penaltisMandante = null;
+            penaltisVisitante = null;
+        }
+
+        validarPenaltis(
+                fase,
+                status,
+                placarMandante,
+                placarVisitante,
+                penaltisMandante,
+                penaltisVisitante);
+
         partida.setData(dto.getData());
         partida.setHora(dto.getHora());
-        partida.setRodada(dto.getRodada());
+        partida.setRodada(rodada);
 
-        if (dto.getPlacarMandante() != null) {
-            partida.setPlacarMandante(dto.getPlacarMandante());
-        }
+        partida.setPlacarMandante(placarMandante);
+        partida.setPlacarVisitante(placarVisitante);
 
-        if (dto.getPlacarVisitante() != null) {
-            partida.setPlacarVisitante(dto.getPlacarVisitante());
-        }
+        partida.setPenaltisMandante(penaltisMandante);
+        partida.setPenaltisVisitante(penaltisVisitante);
 
-        if (dto.getStatus() != null) {
-            partida.setStatus(dto.getStatus());
-        }
+        partida.setStatus(status);
 
         partida.setCampeonato(campeonato);
         partida.setMandante(mandante);
@@ -142,23 +199,59 @@ public class PartidaService {
         return partidaRepository.save(partida);
     }
 
+    // =========================================
+    // REGISTRAR RESULTADO DA PARTIDA
+    // =========================================
+
     public Partida registrarResultado(
             Long id,
             ResultadoPartidaDTO dto) {
 
         Partida partida = buscarPorId(id);
 
+        String fase = normalizarFase(partida.getFase());
+
+        String status = dto.getStatus().trim().toUpperCase();
+
+        validarPenaltis(
+                fase,
+                status,
+                dto.getPlacarMandante(),
+                dto.getPlacarVisitante(),
+                dto.getPenaltisMandante(),
+                dto.getPenaltisVisitante());
+
         partida.setPlacarMandante(dto.getPlacarMandante());
         partida.setPlacarVisitante(dto.getPlacarVisitante());
-        partida.setStatus(dto.getStatus());
+
+        partida.setPenaltisMandante(dto.getPenaltisMandante());
+        partida.setPenaltisVisitante(dto.getPenaltisVisitante());
+
+        partida.setStatus(status);
 
         return partidaRepository.save(partida);
     }
 
+    // =========================================
+    // EXCLUIR PARTIDA
+    // =========================================
+
+    @Transactional
     public void excluir(Long id) {
+
         Partida partida = buscarPorId(id);
+
+        // Exclui os vínculos entre equipes e partida
+        equipePartidaRepository.deleteByPartidaId(id);
+        equipePartidaRepository.flush();
+
+        // Exclui a partida
         partidaRepository.delete(partida);
     }
+
+    // =========================================
+    // BUSCAR CAMPEONATO
+    // =========================================
 
     private Campeonato buscarCampeonato(Long id) {
         return campeonatoRepository.findById(id)
@@ -167,6 +260,10 @@ public class PartidaService {
                         "Campeonato não encontrado"));
     }
 
+    // =========================================
+    // BUSCAR EQUIPE
+    // =========================================
+
     private Equipe buscarEquipe(Long id) {
         return equipeRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -174,13 +271,151 @@ public class PartidaService {
                         "Equipe não encontrada"));
     }
 
+    // =========================================
+    // NORMALIZAR FASE
+    // =========================================
+
     private String normalizarFase(String fase) {
+
         if (fase == null || fase.isBlank()) {
             return null;
         }
 
         return fase.trim().toUpperCase();
     }
+
+    // =========================================
+    // IDENTIFICAR FASE ELIMINATÓRIA
+    // =========================================
+
+    private boolean faseEliminatoria(String fase) {
+
+        return "OITAVAS".equals(fase)
+                || "QUARTAS".equals(fase)
+                || "SEMIFINAL".equals(fase)
+                || "FINAL".equals(fase);
+    }
+
+    // =========================================
+    // VALIDAR RODADA
+    // =========================================
+
+    private Integer validarRodada(
+            String fase,
+            Integer rodada) {
+
+        // Fases eliminatórias não possuem rodada
+        if (faseEliminatoria(fase)) {
+            return null;
+        }
+
+        // Valida as demais fases permitidas
+        if (!"GRUPOS".equals(fase)
+                && !"PONTOS_CORRIDOS".equals(fase)) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Informe uma fase válida para a partida");
+        }
+
+        // Fases de grupos e pontos corridos exigem rodada
+        if (rodada == null || rodada <= 0) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "A rodada é obrigatória e deve ser maior que zero");
+        }
+
+        return rodada;
+    }
+
+    // =========================================
+    // VERIFICAR NECESSIDADE DE PÊNALTIS
+    // =========================================
+
+    private boolean necessitaPenaltis(
+            String fase,
+            String status,
+            Integer placarMandante,
+            Integer placarVisitante) {
+
+        return faseEliminatoria(fase)
+                && "FINALIZADA".equals(status)
+                && placarMandante != null
+                && placarVisitante != null
+                && Objects.equals(
+                        placarMandante,
+                        placarVisitante);
+    }
+
+    // =========================================
+    // VALIDAR DISPUTA DE PÊNALTIS
+    // =========================================
+
+    private void validarPenaltis(
+            String fase,
+            String status,
+            Integer placarMandante,
+            Integer placarVisitante,
+            Integer penaltisMandante,
+            Integer penaltisVisitante) {
+
+        boolean possuiPenaltis =
+                penaltisMandante != null
+                || penaltisVisitante != null;
+
+        boolean obrigatorio = necessitaPenaltis(
+                fase,
+                status,
+                placarMandante,
+                placarVisitante);
+
+        // Pênaltis não são permitidos nesta situação
+        if (!obrigatorio) {
+
+            if (possuiPenaltis) {
+
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Os pênaltis só são permitidos em partidas "
+                        + "eliminatórias finalizadas com empate");
+            }
+
+            return;
+        }
+
+        // Exige os dois placares dos pênaltis
+        if (penaltisMandante == null
+                || penaltisVisitante == null) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Informe os placares da disputa de pênaltis");
+        }
+
+        // Impede placares negativos
+        if (penaltisMandante < 0
+                || penaltisVisitante < 0) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Os placares dos pênaltis não podem ser negativos");
+        }
+
+        // A disputa precisa ter um vencedor
+        if (Objects.equals(
+                penaltisMandante,
+                penaltisVisitante)) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "A disputa de pênaltis não pode terminar empatada");
+        }
+    }
+
+    // =========================================
+    // VALIDAR GRUPO
+    // =========================================
 
     private Grupo validarGrupo(
             String faseInformada,
@@ -192,7 +427,9 @@ public class PartidaService {
         String fase = normalizarFase(faseInformada);
 
         if (grupoId == null) {
+
             if ("GRUPOS".equals(fase)) {
+
                 throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
                         "Partidas da fase de grupos precisam informar grupoId");
@@ -202,6 +439,7 @@ public class PartidaService {
         }
 
         if (!"GRUPOS".equals(fase)) {
+
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "O grupoId só pode ser informado na fase GRUPOS");
@@ -213,19 +451,20 @@ public class PartidaService {
                         "Grupo não encontrado"));
 
         if (!grupo.getCampeonato().getId().equals(campeonatoId)) {
+
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "O grupo não pertence ao campeonato informado");
         }
 
-        // Verifica diretamente no banco se o mandante pertence ao grupo
+        // Verifica se o mandante pertence ao grupo
         boolean mandanteNoGrupo = campeonatoEquipeRepository
                 .existsByCampeonatoIdAndEquipeIdAndGrupoId(
                         campeonatoId,
                         mandanteId,
                         grupoId);
 
-        // Verifica diretamente no banco se o visitante pertence ao grupo
+        // Verifica se o visitante pertence ao grupo
         boolean visitanteNoGrupo = campeonatoEquipeRepository
                 .existsByCampeonatoIdAndEquipeIdAndGrupoId(
                         campeonatoId,
@@ -233,6 +472,7 @@ public class PartidaService {
                         grupoId);
 
         if (!mandanteNoGrupo || !visitanteNoGrupo) {
+
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "As duas equipes precisam estar inscritas no grupo informado");
@@ -241,18 +481,24 @@ public class PartidaService {
         return grupo;
     }
 
+    // =========================================
+    // VALIDAR DADOS DA PARTIDA
+    // =========================================
+
     private void validarPartida(
             PartidaDTO dto,
             Campeonato campeonato) {
 
         if (dto.getMandanteId() == null
                 || dto.getVisitanteId() == null) {
+
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "As equipes são obrigatórias");
         }
 
         if (dto.getMandanteId().equals(dto.getVisitanteId())) {
+
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "A equipe mandante e a visitante não podem ser iguais");
@@ -260,6 +506,7 @@ public class PartidaService {
 
         if (dto.getPlacarMandante() != null
                 && dto.getPlacarMandante() < 0) {
+
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "O placar da equipe mandante não pode ser negativo");
@@ -267,6 +514,7 @@ public class PartidaService {
 
         if (dto.getPlacarVisitante() != null
                 && dto.getPlacarVisitante() < 0) {
+
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "O placar da equipe visitante não pode ser negativo");
@@ -284,6 +532,3 @@ public class PartidaService {
         }
     }
 }
-
-
-

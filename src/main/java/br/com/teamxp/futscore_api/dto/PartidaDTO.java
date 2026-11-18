@@ -1,10 +1,10 @@
-
 package br.com.teamxp.futscore_api.dto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 public class PartidaDTO {
 
@@ -16,7 +16,8 @@ public class PartidaDTO {
     @NotNull(message = "O horário da partida é obrigatório")
     private LocalTime hora;
 
-    @NotNull(message = "A rodada é obrigatória")
+    // A rodada poderá ser nula nas fases eliminatórias
+    @Positive(message = "A rodada deve ser maior que zero")
     private Integer rodada;
 
     private Integer placarMandante;
@@ -133,4 +134,3 @@ public class PartidaDTO {
         this.visitanteId = visitanteId;
     }
 }
-

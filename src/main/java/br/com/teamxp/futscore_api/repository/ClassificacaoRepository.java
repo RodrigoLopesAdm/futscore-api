@@ -1,4 +1,3 @@
-
 package br.com.teamxp.futscore_api.repository;
 
 import java.util.List;
@@ -18,4 +17,9 @@ public interface ClassificacaoRepository
 
     // Verifica se a equipe possui registros de classificação
     boolean existsByEquipeId(Long equipeId);
+
+    // Exclui a classificação de uma equipe em um campeonato
+    void deleteByCampeonatoIdAndEquipeId(
+            Long campeonatoId,
+            Long equipeId);
 }

@@ -1,4 +1,3 @@
-
 package br.com.teamxp.futscore_api.model;
 
 import java.time.LocalDate;
@@ -27,6 +26,11 @@ public class Partida {
     private Integer placarMandante;
 
     private Integer placarVisitante;
+
+    // Resultado da disputa de pênaltis
+    private Integer penaltisMandante;
+
+    private Integer penaltisVisitante;
 
     private String status;
 
@@ -96,6 +100,23 @@ public class Partida {
 
     public void setPlacarVisitante(Integer placarVisitante) {
         this.placarVisitante = placarVisitante;
+    }
+
+    // Getters e setters dos pênaltis
+    public Integer getPenaltisMandante() {
+        return penaltisMandante;
+    }
+
+    public void setPenaltisMandante(Integer penaltisMandante) {
+        this.penaltisMandante = penaltisMandante;
+    }
+
+    public Integer getPenaltisVisitante() {
+        return penaltisVisitante;
+    }
+
+    public void setPenaltisVisitante(Integer penaltisVisitante) {
+        this.penaltisVisitante = penaltisVisitante;
     }
 
     public String getStatus() {

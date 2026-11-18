@@ -10,4 +10,6 @@ public interface EquipePartidaRepository
     boolean existsByEquipeIdAndPartidaId(
             Long equipeId,
             Long partidaId);
+
+    void deleteByPartidaId(Long partidaId);
 }

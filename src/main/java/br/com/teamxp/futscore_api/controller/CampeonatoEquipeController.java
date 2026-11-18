@@ -65,7 +65,6 @@ public class CampeonatoEquipeController {
                 grupoId);
     }
 
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         campeonatoEquipeService.excluir(id);

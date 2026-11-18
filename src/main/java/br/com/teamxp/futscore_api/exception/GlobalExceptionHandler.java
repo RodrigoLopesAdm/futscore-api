@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
 
     erro.put("timestamp", LocalDateTime.now());
     erro.put("status", exception.getStatusCode().value());
-    erro.put("error", "Not Found");
+    erro.put("error", HttpStatus.valueOf(exception.getStatusCode().value()).getReasonPhrase());
     erro.put("message", exception.getReason());
 
     return ResponseEntity

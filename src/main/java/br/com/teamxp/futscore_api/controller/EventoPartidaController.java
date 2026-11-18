@@ -16,9 +16,14 @@ import br.com.teamxp.futscore_api.dto.EventoPartidaDTO;
 import br.com.teamxp.futscore_api.model.EventoPartida;
 import br.com.teamxp.futscore_api.service.EventoPartidaService;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 @RestController
 @RequestMapping("/api/eventos-partida")
+@CrossOrigin(origins = {
+    "http://localhost:5500",
+    "http://127.0.0.1:5500"
+})
 public class EventoPartidaController {
 
     private final EventoPartidaService eventoPartidaService;
